@@ -670,15 +670,20 @@ class PatientDashboardController extends Controller
     {
         $user = auth()->user();
 
+        // Base query for billing records
+        $billingQuery = Billing::where('patient_id', $user->id)
+            ->orderBy('invoice_date', 'desc');
+
+        // Get billing statistics from full dataset
+        $totalBilled = $billingQuery->sum('total_amount');
+        $totalPaid = $billingQuery->sum('amount_paid');
+        $totalOutstanding = $billingQuery->sum('balance_due');
+        $overdueCount = $billingQuery->where('payment_status', 'overdue')->count();
+
+        // Get paginated records for display (use fresh query to avoid where clause from above affecting results)
         $billingRecords = Billing::where('patient_id', $user->id)
             ->orderBy('invoice_date', 'desc')
             ->paginate(10);
-
-        // Get billing statistics
-        $totalBilled = $billingRecords->sum('total_amount');
-        $totalPaid = $billingRecords->sum('amount_paid');
-        $totalOutstanding = $billingRecords->sum('balance_due');
-        $overdueCount = $billingRecords->where('payment_status', 'overdue')->count();
 
         return view('patient.billing', compact(
             'user',
