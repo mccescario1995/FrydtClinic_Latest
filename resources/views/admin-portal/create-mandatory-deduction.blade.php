@@ -258,96 +258,104 @@
     </div>
 @endsection
 
-@push('scripts')
+@section('scripts')
     <script>
         document.addEventListener('DOMContentLoaded', function () {
 
-            // =============================
-            // AUTO NAME FILL
-            // =============================
-            const deductionTypeSelect = document.getElementById('deduction_type');
+            // ─── AUTO NAME FILL ───────────────────────────────────────────
+            const typeSelect = document.getElementById('deduction_type');
             const nameInput = document.getElementById('name');
 
-            deductionTypeSelect.addEventListener('change', function () {
-                const selectedType = this.value;
-                const deductionTypes = @json($deductionTypes);
-
-                if (selectedType && !nameInput.value) {
-                    nameInput.value = deductionTypes[selectedType] || '';
+            typeSelect.addEventListener('change', function () {
+                const types = @json($deductionTypes);
+                if (this.value && !nameInput.value.trim()) {
+                    nameInput.value = types[this.value] ?? '';
                 }
             });
 
-            // =============================
-            // VALIDATE AMOUNT
-            // =============================
-            const percentageInput = document.getElementById('percentage_rate');
-            const fixedAmountInput = document.getElementById('fixed_amount');
+            // ─── VALIDATE AMOUNTS ─────────────────────────────────────────
+            const pctInput = document.getElementById('percentage_rate');
+            const fixedInput = document.getElementById('fixed_amount');
 
             function validateAmounts() {
-                const percentage = parseFloat(percentageInput.value) || 0;
-                const fixed = parseFloat(fixedAmountInput.value) || 0;
-
-                if (percentage === 0 && fixed === 0) {
-                    percentageInput.setCustomValidity('Provide percentage or fixed amount');
-                    fixedAmountInput.setCustomValidity('Provide percentage or fixed amount');
-                } else {
-                    percentageInput.setCustomValidity('');
-                    fixedAmountInput.setCustomValidity('');
-                }
+                const pct = parseFloat(pctInput.value) || 0;
+                const fixed = parseFloat(fixedInput.value) || 0;
+                const msg = (pct === 0 && fixed === 0)
+                    ? 'Provide a percentage rate or a fixed amount.'
+                    : '';
+                pctInput.setCustomValidity(msg);
+                fixedInput.setCustomValidity(msg);
             }
 
-            percentageInput.addEventListener('input', validateAmounts);
-            fixedAmountInput.addEventListener('input', validateAmounts);
+            pctInput.addEventListener('input', validateAmounts);
+            fixedInput.addEventListener('input', validateAmounts);
 
-            // =============================
-            // POSITION FILTER + TOGGLE
-            // =============================
-            document.querySelectorAll('.position-btn').forEach(button => {
-                button.addEventListener('click', function () {
-                    const position = this.getAttribute('data-position');
+            // ─── HELPERS ──────────────────────────────────────────────────
+            function visibleCheckboxes(selector = '.employee-checkbox') {
+                return Array.from(document.querySelectorAll(selector))
+                    .filter(cb => cb.closest('.employee-item').style.display !== 'none');
+            }
 
-                    let allChecked = true;
+            function visibleByPosition(position) {
+                return visibleCheckboxes(`.employee-checkbox[data-position="${position}"]`);
+            }
 
-                    document.querySelectorAll('.employee-checkbox').forEach(cb => {
-                        if (cb.dataset.position === position && !cb.checked) {
-                            allChecked = false;
-                        }
-                    });
+            // ─── POSITION BUTTON SYNC ─────────────────────────────────────
+            function syncBtn(btn) {
+                const boxes = visibleByPosition(btn.dataset.position);
+                const total = boxes.length;
+                const checked = boxes.filter(cb => cb.checked).length;
+                const allChecked = total > 0 && checked === total;
+                const partial = checked > 0 && checked < total;
 
-                    document.querySelectorAll('.employee-checkbox').forEach(cb => {
-                        if (cb.dataset.position === position) {
-                            cb.checked = !allChecked;
-                        }
-                    });
+                btn.classList.toggle('btn-success', allChecked);
+                btn.classList.toggle('btn-warning', partial);
+                btn.classList.toggle('btn-outline-success', !allChecked && !partial);
+                btn.style.opacity = total === 0 ? '0.4' : '1';
+            }
 
-                    // highlight active
-                    this.classList.toggle('active');
+            function syncAllBtns() {
+                document.querySelectorAll('.position-btn').forEach(syncBtn);
+            }
+
+            // ─── POSITION BUTTON CLICK ────────────────────────────────────
+            document.querySelectorAll('.position-btn').forEach(btn => {
+                btn.addEventListener('click', function () {
+                    const boxes = visibleByPosition(this.dataset.position);
+                    const allChecked = boxes.length > 0 && boxes.every(cb => cb.checked);
+                    boxes.forEach(cb => { cb.checked = !allChecked; });
+                    syncAllBtns();
                 });
             });
 
-            // =============================
-            // SELECT ALL / CLEAR ALL
-            // =============================
-            document.getElementById('selectAll').onclick = () => {
-                document.querySelectorAll('.employee-checkbox').forEach(cb => cb.checked = true);
-            };
+            // ─── MANUAL CHECKBOX SYNC ─────────────────────────────────────
+            document.querySelectorAll('.employee-checkbox').forEach(cb => {
+                cb.addEventListener('change', syncAllBtns);
+            });
 
-            document.getElementById('clearAll').onclick = () => {
-                document.querySelectorAll('.employee-checkbox').forEach(cb => cb.checked = false);
-            };
+            // ─── SELECT ALL / CLEAR ALL ───────────────────────────────────
+            document.getElementById('selectAll').addEventListener('click', () => {
+                visibleCheckboxes().forEach(cb => { cb.checked = true; });
+                syncAllBtns();
+            });
 
-            // =============================
-            // SEARCH FILTER
-            // =============================
+            document.getElementById('clearAll').addEventListener('click', () => {
+                visibleCheckboxes().forEach(cb => { cb.checked = false; });
+                syncAllBtns();
+            });
+
+            // ─── SEARCH FILTER ────────────────────────────────────────────
             document.getElementById('employeeSearch').addEventListener('input', function () {
-                const keyword = this.value.toLowerCase();
-
+                const kw = this.value.toLowerCase();
                 document.querySelectorAll('.employee-item').forEach(item => {
-                    const text = item.innerText.toLowerCase();
-                    item.style.display = text.includes(keyword) ? '' : 'none';
+                    item.style.display = item.innerText.toLowerCase().includes(kw) ? '' : 'none';
                 });
+                syncAllBtns();
             });
 
+            // ─── INIT ─────────────────────────────────────────────────────
+            syncAllBtns();
+            validateAmounts();
         });
     </script>
-@endpush
+@endsection
