@@ -231,20 +231,27 @@
                                     </td>
                                     <td>{{ $deduction->effective_date ? $deduction->effective_date->format('M d, Y') : 'N/A' }}</td>
                                     <td>
-                                        <div class="btn-group" role="group">
-                                            <a href="{{ route('admin-portal.mandatory-deductions.show', $deduction->id) }}"
-                                               class="btn btn-sm btn-outline-info" title="View Details">
-                                                <i class="fas fa-eye"></i>
-                                            </a>
-                                            <a href="{{ route('admin-portal.mandatory-deductions.edit', $deduction->id) }}"
-                                               class="btn btn-sm btn-outline-primary" title="Edit">
-                                                <i class="fas fa-edit"></i>
-                                            </a>
-                                            <button type="button" class="btn btn-sm btn-outline-danger"
-                                                    onclick="confirmDelete({{ $deduction->id }})" title="Delete">
-                                                <i class="fas fa-trash"></i>
-                                            </button>
-                                        </div>
+                                         <div class="btn-group" role="group">
+                                             <a href="{{ route('admin-portal.mandatory-deductions.show', $deduction->id) }}"
+                                                class="btn btn-sm btn-outline-info" title="View Details">
+                                                 <i class="fas fa-eye"></i>
+                                             </a>
+                                             <a href="{{ route('admin-portal.mandatory-deductions.edit', $deduction->id) }}"
+                                                class="btn btn-sm btn-outline-primary" title="Edit">
+                                                 <i class="fas fa-edit"></i>
+                                             </a>
+                                              @if($deduction->employeeDeductions()->count() == 0)
+                                                  <button type="button" class="btn btn-sm btn-outline-danger"
+                                                          onclick="confirmDelete({{ $deduction->id }}, '{{ addslashes($deduction->name) }}')" title="Delete">
+                                                      <i class="fas fa-trash"></i>
+                                                  </button>
+                                              @else
+                                                  <button type="button" class="btn btn-sm btn-outline-danger" disabled
+                                                          title="Cannot delete: has employee associations">
+                                                      <i class="fas fa-trash"></i>
+                                                  </button>
+                                              @endif
+                                         </div>
                                     </td>
                                 </tr>
                             @endforeach
@@ -285,11 +292,15 @@
                 <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
             </div>
             <div class="modal-body">
-                Are you sure you want to delete this mandatory deduction? This action cannot be undone.
+                <div class="alert alert-warning">
+                    <i class="fas fa-exclamation-triangle"></i>
+                    <strong>Warning:</strong> This action cannot be undone.
+                </div>
+                <p>Are you sure you want to delete the mandatory deduction "<strong id="deductionName"></strong>"?</p>
             </div>
             <div class="modal-footer">
                 <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
-                <form id="deleteForm" method="POST" style="display: inline;">
+                <form id="deleteDeductionForm" method="POST" style="display: inline;">
                     @csrf
                     @method('DELETE')
                     <button type="submit" class="btn btn-danger">Delete</button>
@@ -298,14 +309,20 @@
         </div>
     </div>
 </div>
+
 @endsection
 
-@push('scripts')
+@section('scripts')
 <script>
-function confirmDelete(deductionId) {
-    const deleteForm = document.getElementById('deleteForm');
-    deleteForm.action = `{{ url('admin-portal/mandatory-deductions') }}/${deductionId}`;
+function confirmDelete(deductionId, deductionName) {
+    // Update modal content
+    document.getElementById('deductionName').textContent = deductionName;
 
+    // Update form action
+    const form = document.getElementById('deleteDeductionForm');
+    form.action = `{{ url('/admin-portal/mandatory-deductions') }}/${deductionId}`;
+
+    // Show modal
     const deleteModal = new bootstrap.Modal(document.getElementById('deleteModal'));
     deleteModal.show();
 }
@@ -320,7 +337,7 @@ document.addEventListener('DOMContentLoaded', function() {
     });
 });
 </script>
-@endpush
+@endsection
 
 @push('styles')
 <style>
