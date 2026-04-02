@@ -12,8 +12,6 @@
     <link rel="dns-prefetch" href="//fonts.bunny.net">
     <link href="https://fonts.bunny.net/css?family=Nunito" rel="stylesheet">
 
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.7/dist/css/bootstrap.min.css" rel="stylesheet"
-        integrity="sha384-LN+7fdVzj6u52u30Kp6M/trliBMCMKTyK833zpbD+pXdCLuTusPj697FH4R/5mcr" crossorigin="anonymous">
 
     <!-- Font Awesome -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
@@ -342,6 +340,9 @@
             color: white;
         }
     </style>
+
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css" rel="stylesheet"
+        integrity="sha384-sRIl4kxILFvY47J16cr9ZwB07vP4J8+LH7qKQnuqkuIAvNWLzeN8tE5YBujZqJLB" crossorigin="anonymous">
 </head>
 
 <body>
@@ -361,79 +362,79 @@
                     <ul class="navbar-nav me-auto">
                         <li class="nav-item">
                             <a class="nav-link {{ request()->routeIs('admin-portal.dashboard') ? 'active' : '' }}"
-                               href="{{ route('admin-portal.dashboard') }}">
+                                href="{{ route('admin-portal.dashboard') }}">
                                 <i class="fas fa-tachometer-alt me-1"></i>Dashboard
                             </a>
                         </li>
                         <li class="nav-item">
                             <a class="nav-link {{ request()->routeIs('admin-portal.users*') ? 'active' : '' }}"
-                               href="{{ route('admin-portal.users') }}">
+                                href="{{ route('admin-portal.users') }}">
                                 <i class="fas fa-users me-1"></i>Users
                             </a>
                         </li>
                         <li class="nav-item">
                             <a class="nav-link {{ request()->routeIs('admin-portal.services*') ? 'active' : '' }}"
-                               href="{{ route('admin-portal.services') }}">
+                                href="{{ route('admin-portal.services') }}">
                                 <i class="fas fa-stethoscope me-1"></i>Services
                             </a>
                         </li>
                         <li class="nav-item">
                             <a class="nav-link {{ request()->routeIs('admin-portal.patients*') ? 'active' : '' }}"
-                               href="{{ route('admin-portal.patients') }}">
+                                href="{{ route('admin-portal.patients') }}">
                                 <i class="fas fa-user-injured me-1"></i>Patients
                             </a>
                         </li>
                         <li class="nav-item">
                             <a class="nav-link {{ request()->routeIs('admin-portal.payroll*') ? 'active' : '' }}"
-                               href="{{ route('admin-portal.payroll') }}">
+                                href="{{ route('admin-portal.payroll') }}">
                                 <i class="fas fa-money-check me-1"></i>Payroll
                             </a>
                         </li>
                         <li class="nav-item">
                             <a class="nav-link {{ request()->routeIs('admin-portal.appointments*') ? 'active' : '' }}"
-                               href="{{ route('admin-portal.appointments') }}">
+                                href="{{ route('admin-portal.appointments') }}">
                                 <i class="fas fa-calendar-check me-1"></i>Appointments
                             </a>
                         </li>
                         <li class="nav-item">
                             <a class="nav-link {{ request()->routeIs('admin-portal.attendance') ? 'active' : '' }}"
-                               href="{{ route('admin-portal.attendance') }}">
+                                href="{{ route('admin-portal.attendance') }}">
                                 <i class="fas fa-clock me-1"></i>Attendance
                             </a>
                         </li>
                         <li class="nav-item">
                             <a class="nav-link {{ request()->routeIs('admin-portal.clock-in-out') ? 'active' : '' }}"
-                               href="{{ route('admin-portal.clock-in-out') }}">
+                                href="{{ route('admin-portal.clock-in-out') }}">
                                 <i class="fas fa-fingerprint me-1"></i>Time In/Out
                             </a>
                         </li>
                         <li class="nav-item">
                             <a class="nav-link {{ request()->routeIs('admin-portal.documents*') ? 'active' : '' }}"
-                               href="{{ route('admin-portal.documents') }}">
+                                href="{{ route('admin-portal.documents') }}">
                                 <i class="fas fa-file-alt me-1"></i>Documents
                             </a>
                         </li>
                         <li class="nav-item">
                             <a class="nav-link {{ request()->routeIs('admin-portal.medical-records') ? 'active' : '' }}"
-                               href="{{ route('admin-portal.medical-records') }}">
+                                href="{{ route('admin-portal.medical-records') }}">
                                 <i class="fas fa-file-medical me-1"></i>Medical Records
                             </a>
                         </li>
                         <li class="nav-item">
                             <a class="nav-link {{ request()->routeIs('admin-portal.reports') ? 'active' : '' }}"
-                               href="{{ route('admin-portal.reports') }}">
+                                href="{{ route('admin-portal.reports') }}">
                                 <i class="fas fa-chart-bar me-1"></i>Reports
                             </a>
                         </li>
                         <li class="nav-item">
                             <a class="nav-link {{ request()->routeIs('admin-portal.sms-logs') ? 'active' : '' }}"
-                               href="{{ route('admin-portal.sms-logs') }}">
+                                href="{{ route('admin-portal.sms-logs') }}">
                                 <i class="fas fa-sms me-1"></i>SMS Logs
                             </a>
                         </li>
                         <li class="nav-item">
                             <a class="nav-link {{ request()->routeIs('admin-portal.settings') ? 'active' : '' }}"
-                               href="{{ route('admin-portal.settings') }}">
+                                href="{{ route('admin-portal.settings') }}">
                                 <i class="fas fa-cogs me-1"></i>Settings
                             </a>
                         </li>
@@ -542,7 +543,8 @@
                     <!-- Logout -->
                     <ul class="navbar-nav">
                         <li class="nav-item">
-                            <button type="button" class="btn btn-outline-light nav-link" data-bs-toggle="modal" data-bs-target="#logoutModal">
+                            <button type="button" class="btn btn-outline-light nav-link" data-bs-toggle="modal"
+                                data-bs-target="#logoutModal">
                                 <i class="fas fa-sign-out-alt me-1"></i>Logout
                             </button>
                         </li>
@@ -564,11 +566,11 @@
     </div>
 
     <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.8/dist/umd/popper.min.js"
-        integrity="sha384-I7E8VVD/ismYTF4hNIPjVp/Zjvgyol6VFvRkX/vR+Vc4jQkC+hVqc2pM8ODewa9r" crossorigin="anonymous">
-    </script>
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.7/dist/js/bootstrap.min.js"
-        integrity="sha384-7qAoOXltbVP82dhxHAUje59V5r2YsVfBafyUDxEdApLPmcdhBPg1DKg1ERo0BZlK" crossorigin="anonymous">
-    </script>
+        integrity="sha384-I7E8VVD/ismYTF4hNIPjVp/Zjvgyol6VFvRkX/vR+Vc4jQkC+hVqc2pM8ODewa9r"
+        crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.min.js"
+        integrity="sha384-G/EV+4j2dNv+tEPo3++6LCgdCROaejBqfUeNjuKAiuXbjrxilcCdDz6ZAVfHWe1Y"
+        crossorigin="anonymous"></script>
 
     <script src="https://kit.fontawesome.com/a076d05399.js" crossorigin="anonymous"></script>
 
@@ -597,7 +599,7 @@
         // Reusable functions for modals and toasts
         window.AdminUtils = {
             // Show confirmation modal
-            confirmDelete: function(title, message, confirmCallback) {
+            confirmDelete: function (title, message, confirmCallback) {
                 const modalHtml = `
                     <div class="modal fade" id="deleteConfirmModal" tabindex="-1" aria-labelledby="deleteConfirmModalLabel" aria-hidden="true">
                         <div class="modal-dialog">
@@ -632,7 +634,7 @@
                 modal.show();
 
                 // Handle confirm button
-                document.getElementById('confirmDeleteBtn').addEventListener('click', function() {
+                document.getElementById('confirmDeleteBtn').addEventListener('click', function () {
                     modal.hide();
                     if (confirmCallback && typeof confirmCallback === 'function') {
                         confirmCallback();
@@ -640,25 +642,25 @@
                 });
 
                 // Clean up modal after hiding
-                document.getElementById('deleteConfirmModal').addEventListener('hidden.bs.modal', function() {
+                document.getElementById('deleteConfirmModal').addEventListener('hidden.bs.modal', function () {
                     this.remove();
                 });
             },
 
             // Toast notifications
-            showSuccess: function(message) {
+            showSuccess: function (message) {
                 toastr.success(message);
             },
 
-            showError: function(message) {
+            showError: function (message) {
                 toastr.error(message);
             },
 
-            showWarning: function(message) {
+            showWarning: function (message) {
                 toastr.warning(message);
             },
 
-            showInfo: function(message) {
+            showInfo: function (message) {
                 toastr.info(message);
             }
         };

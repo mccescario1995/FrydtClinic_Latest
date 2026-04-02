@@ -17,6 +17,7 @@ use App\Models\Document;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Log;
 use App\Services\ActivityLogger;
 
 class AdminController extends Controller
@@ -485,7 +486,7 @@ class AdminController extends Controller
 
         // Debug: Check total records before filters
         $totalBeforeFilters = EmployeeAttendance::count();
-        \Log::info("Total attendance records in DB: " . $totalBeforeFilters);
+        \Illuminate\Support\Facades\Log::info("Total attendance records in DB: " . $totalBeforeFilters);
 
         // Filter by employee
         if ($request->has('employee_id') && ! is_null($request->employee_id) && $request->employee_id !== '') {
@@ -521,8 +522,8 @@ class AdminController extends Controller
         $attendanceRecords = $query->orderBy('date', 'desc')->paginate(20);
 
         // Debug: Check query results
-        \Log::info("Attendance records after query: " . $attendanceRecords->count());
-        \Log::info("First record employee: " . ($attendanceRecords->first() ? $attendanceRecords->first()->employee : 'null'));
+        \Illuminate\Support\Facades\Log::info("Attendance records after query: " . $attendanceRecords->count());
+        \Illuminate\Support\Facades\Log::info("First record employee: " . ($attendanceRecords->first() ? $attendanceRecords->first()->employee : 'null'));
 
         // Get employees for filter dropdown
         $employees = User::where('user_type', 'employee')->orderBy('name')->get();
@@ -3699,7 +3700,23 @@ class AdminController extends Controller
     public function createMandatoryDeduction()
     {
         $deductionTypes = \App\Models\MandatoryDeduction::getPhilippineDeductionTypes();
-        return view('admin-portal.create-mandatory-deduction', compact('deductionTypes'));
+        $employees = \App\Models\User::where('user_type', 'employee')
+            ->with('employeeProfile')
+            ->orderBy('name')
+            ->get(['id', 'name']);
+        $positions = User::where('user_type', 'employee')
+            ->join('employee_profiles', 'employee_profiles.employee_id', '=', 'users.id')
+            ->whereNotNull('employee_profiles.position')
+            ->distinct()
+            ->orderBy('employee_profiles.position')
+            ->pluck('employee_profiles.position')
+            ->toArray();
+        
+        return view('admin-portal.create-mandatory-deduction', compact(
+            'deductionTypes', 
+            'employees',
+            'positions'
+        ));
     }
 
     /**
@@ -3718,9 +3735,27 @@ class AdminController extends Controller
             'is_active' => 'boolean',
             'effective_date' => 'nullable|date',
             'notes' => 'nullable|string',
+            // Selection validation
+            'selection_mode' => 'required|in:individual,position',
+            'employee_ids' => 'required_if:selection_mode,individual|array',
+            'employee_ids.*' => 'exists:users,id',
+            'positions' => 'required_if:selection_mode,position|array',
+        ], [], [
+            'selection_mode' => 'Selection method',
+            'employee_ids' => 'Employees',
+            'positions' => 'Positions'
         ]);
-
-        \App\Models\MandatoryDeduction::create([
+        
+        // Validate that at least one selection method has values
+        if ($request->selection_mode === 'individual' && empty($request->employee_ids)) {
+            $request->merge(['employee_ids' => []]); // Will trigger validation error
+        }
+        if ($request->selection_mode === 'position' && empty($request->positions)) {
+            $request->merge(['positions' => []]); // Will trigger validation error
+        }
+        
+        // Create the mandatory deduction
+        $deduction = \App\Models\MandatoryDeduction::create([
             'deduction_type' => $request->deduction_type,
             'name' => $request->name,
             'description' => $request->description,
@@ -3732,10 +3767,43 @@ class AdminController extends Controller
             'effective_date' => $request->effective_date,
             'notes' => $request->notes,
         ]);
-
-        ActivityLogger::logCreated(\App\Models\MandatoryDeduction::latest()->first(), "Created new mandatory deduction {$request->name}");
-
-        return redirect()->route('admin-portal.mandatory-deductions')->with('success', 'Mandatory deduction created successfully.');
+        
+        // Get employees to apply deduction to
+        $employeeIds = [];
+        
+        if ($request->selection_mode === 'individual') {
+            $employeeIds = $request->employee_ids;
+        } elseif ($request->selection_mode === 'position') {
+            // Get all employees with selected positions
+            $employees = \App\Models\User::where('user_type', 'employee')
+                ->whereHas('employeeProfile', function ($query) use ($request) {
+                    $query->whereIn('position', $request->positions);
+                })
+                ->pluck('id')
+                ->toArray();
+            
+            $employeeIds = $employees;
+        }
+        
+        // Create employee deduction records
+        foreach ($employeeIds as $employeeId) {
+            \App\Models\EmployeeDeduction::firstOrCreate(
+                ['employee_id' => $employeeId, 'deduction_id' => $deduction->id],
+                [
+                    'is_enabled' => true,
+                    'custom_percentage_rate' => null,
+                    'custom_fixed_amount' => null,
+                    'notes' => $request->selection_mode === 'position' 
+                        ? 'Applied via position selection: ' . implode(', ', $request->positions)
+                        : 'Applied via individual selection'
+                ]
+            );
+        }
+        
+        ActivityLogger::logCreated($deduction, "Created new mandatory deduction {$request->name}");
+        
+        return redirect()->route('admin-portal.mandatory-deductions')
+            ->with('success', 'Mandatory deduction created successfully and applied to ' . count($employeeIds) . ' employee(s).');
     }
 
     /**
