@@ -129,31 +129,39 @@
                     });
             }
 
-            function loadTimeSlots() {
-                $.get('{{ route('patient.api.available-time-slots') }}', {
-                        employee_id: $('#employee_id').val(),
-                        service_id: $('#service_id').val(),
-                        appointment_date: $('#appointment_date').val()
-                    })
-                    .done(function(data) {
-                        let options = '<option value="">Select a time</option>';
-                        if (data.length === 0) {
-                            options = '<option value="">No available time slots</option>';
-                        } else {
-                            data.forEach(function(slot) {
-                                options += `<option value="${slot.time}">${slot.display}</option>`;
-                            });
-                        }
-                        $('#appointment_time').html(options).prop('disabled', data.length === 0);
-                    })
-                    .fail(function(xhr) {
-                        if (xhr.status === 404) {
-                            $('#appointment_time').html('<option value="">Employee not available</option>').prop('disabled', true);
-                        } else {
-                            alert('Error loading time slots. Please try again.');
-                        }
-                    });
-            }
+             function loadTimeSlots() {
+                 $.get('{{ route('patient.api.available-time-slots') }}', {
+                         employee_id: $('#employee_id').val(),
+                         service_id: $('#service_id').val(),
+                         appointment_date: $('#appointment_date').val()
+                     })
+                     .done(function(data) {
+                         let options = '<option value="">Select a time</option>';
+                         if (data.length === 0) {
+                             options = '<option value="">No available time slots</option>';
+                         } else {
+                             data.forEach(function(slot) {
+                                 if (slot.available) {
+                                     options += `<option value="${slot.time}">${slot.display}</option>`;
+                                 } else {
+                                     options += `<option value="${slot.time}" disabled>${slot.display}</option>`;
+                                 }
+                             });
+                         }
+                         $('#appointment_time').html(options);
+                         
+                         // Check if all slots are disabled (none available)
+                         const allDisabled = data.every(slot => !slot.available);
+                         $('#appointment_time').prop('disabled', allDisabled);
+                     })
+                     .fail(function(xhr) {
+                         if (xhr.status === 404) {
+                             $('#appointment_time').html('<option value="">Employee not available</option>').prop('disabled', true);
+                         } else {
+                             alert('Error loading time slots. Please try again.');
+                         }
+                     });
+             }
         });
     </script>
 @endpush

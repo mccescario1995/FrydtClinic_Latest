@@ -368,43 +368,43 @@ class PatientDashboardController extends Controller
                 })->toArray(),
             ]);
 
-            $slots = [];
-            $current = $workStart->copy();
-            $iterationCount = 0;
+             $slots = [];
+             $current = $workStart->copy();
+             $iterationCount = 0;
 
-            while ($current->copy()->addMinutes($duration)->lte($workEnd)) {
-                $iterationCount++;
-                if ($iterationCount > 100) { // Prevent infinite loop
-                    \Log::channel('daily')->error('Infinite loop detected in time slot generation');
-                    break;
-                }
+             while ($current->copy()->addMinutes($duration)->lte($workEnd)) {
+                 $iterationCount++;
+                 if ($iterationCount > 100) { // Prevent infinite loop
+                     \Log::channel('daily')->error('Infinite loop detected in time slot generation');
+                     break;
+                 }
 
-                $slotEnd = $current->copy()->addMinutes($duration);
+                 $slotEnd = $current->copy()->addMinutes($duration);
 
-                $overlaps = $appointments->contains(function ($appt) use ($current, $slotEnd) {
-                    $apptStart = Carbon::parse($appt->appointment_datetime);
-                    $apptEnd = $apptStart->copy()->addMinutes($appt->duration_in_minutes);
+                 $overlaps = $appointments->contains(function ($appt) use ($current, $slotEnd) {
+                     $apptStart = Carbon::parse($appt->appointment_datetime);
+                     $apptEnd = $apptStart->copy()->addMinutes($appt->duration_in_minutes);
 
-                    return $current < $apptEnd && $slotEnd > $apptStart;
-                });
+                     return $current < $apptEnd && $slotEnd > $apptStart;
+                 });
 
-                if (! $overlaps) {
-                    $slots[] = [
-                        'time' => $current->format('H:i'),
-                        'display' => $current->format('g:i A'),
-                    ];
-                }
+                 $slots[] = [
+                     'time' => $current->format('H:i'),
+                     'display' => $current->format('g:i A'),
+                     'available' => ! $overlaps
+                 ];
 
-                $current->addMinutes(30); // slot interval
-            }
+                 $current->addMinutes(30); // slot interval
+             }
 
-            \Log::channel('daily')->info('Time slots generated', [
-                'total_slots' => count($slots),
-                'iterations' => $iterationCount,
-                'slots' => $slots,
-            ]);
+             \Log::channel('daily')->info('Time slots generated', [
+                 'total_slots' => count($slots),
+                 'available_slots' => count(array_filter($slots, fn($slot) => $slot['available'])),
+                 'iterations' => $iterationCount,
+                 'slots' => $slots,
+             ]);
 
-            return response()->json($slots);
+             return response()->json($slots);
 
         } catch (\Exception $e) {
             \Log::channel('daily')->error('Exception in getAvailableTimeSlots', [

@@ -135,7 +135,7 @@
                             </table>
                         </div>
                         <div class="d-flex justify-content-center mt-3">
-                            {{ $billingRecords->links() }}
+                            {{ $billingRecords->appends(request()->query())->links('vendor.pagination.admin-portal') }}
                         </div>
                     @else
                         <div class="text-center py-5">
