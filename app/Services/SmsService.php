@@ -140,7 +140,7 @@ class SmsService
             return false;
         }
 
-        $message = "FRYDT Clinic: Appointment booked successfully!\n" .
+        $message = "Appointment booked successfully!\n" .
                    "Date: " . $appointment->appointment_datetime->format('M d, Y h:i A') . "\n" .
                    "Service: " . $appointment->service->name . "\n" .
                    "Provider: " . $appointment->employee->name . "\n" .
@@ -198,7 +198,7 @@ class SmsService
             return false;
         }
 
-        $message = "FRYDT Clinic: Your appointment has been confirmed!\n" .
+        $message = "Your appointment has been confirmed!\n" .
                    "Date: " . $appointment->appointment_datetime->format('M d, Y h:i A') . "\n" .
                    "Service: " . $appointment->service->name . "\n" .
                    "Provider: " . $appointment->employee->name;
@@ -228,7 +228,7 @@ class SmsService
             return false;
         }
 
-        $message = "FRYDT Clinic Reminder: You have an appointment tomorrow!\n" .
+        $message = "Reminder: You have an appointment tomorrow!\n" .
                    "Date: " . $appointment->appointment_datetime->format('M d, Y h:i A') . "\n" .
                    "Service: " . $appointment->service->name . "\n" .
                    "Provider: " . $appointment->employee->name;
@@ -258,7 +258,7 @@ class SmsService
             return false;
         }
 
-        $message = "FRYDT Clinic: Payment received successfully!\n" .
+        $message = "Payment received successfully!\n" .
                    "Amount: ₱" . number_format($payment->amount, 2) . "\n" .
                    "Reference: " . ($payment->payment_reference ?? 'N/A') . "\n" .
                    "Thank you for choosing FRYDT Clinic!";
@@ -290,7 +290,7 @@ class SmsService
             return false;
         }
 
-        $message = "FRYDT Clinic: Your lab results are ready!\n" .
+        $message = "Your lab results are ready!\n" .
                    "Test: " . $labResult->test_name . "\n" .
                    "Status: " . $labResult->result_status . "\n" .
                    "Please login to view detailed results.";
@@ -307,20 +307,183 @@ class SmsService
     }
 
     /**
-     * Send OTP verification SMS
+     * Send OTP via iProgSMS OTP API
      */
-    public function sendOtp($phone, $otp, $options = [])
+    public function sendOtp($phone, $options = [])
     {
         if (!$phone || $phone === 'Not provided') {
             Log::info('No phone number available for OTP SMS');
             return false;
         }
 
-        $message = "[FRYDT Clinic] OTP: {$otp} for your account. Valid for 5 mins only. Never share this code.";
+        // Check if iProgSMS is configured
+        if (!$this->apiToken) {
+            $error = 'iProgSMS service not configured - missing API token';
+            Log::warning($error);
+            return false;
+        }
 
-        return $this->sendSms($phone, $message, array_merge($options, [
-            'type' => 'otp_verification'
-        ]));
+        // Format phone number
+        $formattedPhone = $this->formatPhoneNumber($phone);
+
+        // Prepare iProgSMS OTP API request
+        $sendData = [
+            'api_token' => $this->apiToken,
+            'phone_number' => $formattedPhone,
+        ];
+
+        // Add optional message if provided
+        if (!empty($options['message'])) {
+            $sendData['message'] = $options['message'];
+        }
+
+        // Add optional expires_in_minutes if provided (default 5 minutes)
+        if (!empty($options['expires_in_minutes'])) {
+            $sendData['expires_in_minutes'] = $options['expires_in_minutes'];
+        }
+
+        try {
+            // Send OTP via iProgSMS OTP API
+            $response = Http::withHeaders([
+                'Content-Type' => 'application/json'
+            ])->withOptions([
+                'verify' => false, // Disable SSL verification for development/testing
+            ])->post('https://www.iprogsms.com/api/v1/otp/send_otp', $sendData);
+
+            if ($response->successful()) {
+                $responseData = $response->json();
+
+                if (isset($responseData['status']) && $responseData['status'] === 'success' && isset($responseData['data'])) {
+                    $data = $responseData['data'];
+
+                    // Update user with OTP data
+                    if (!empty($options['user_id'])) {
+                        $user = \App\Models\User::find($options['user_id']);
+                        if ($user) {
+                            $user->update([
+                                'otp_code' => $data['otp_code'] ?? null,
+                                'otp_expires_at' => $data['otp_code_expires_at'] ?? null,
+                                'otp_last_sent_at' => now(),
+                            ]);
+                        }
+                    }
+
+                    Log::info('OTP sent successfully via iProgSMS', [
+                        'to' => $formattedPhone,
+                        'response' => $responseData,
+                        'type' => 'otp_verification'
+                    ]);
+
+                    return true;
+                } else {
+                    $errorMessage = 'Invalid response from iProgSMS OTP API: ' . json_encode($responseData);
+                    Log::error('iProgSMS OTP API error', [
+                        'to' => $formattedPhone,
+                        'response' => $responseData,
+                        'type' => 'otp_verification'
+                    ]);
+                    return false;
+                }
+            } else {
+                $errorMessage = 'iProgSMS OTP API error: ' . $response->status() . ' - ' . $response->body();
+
+                Log::error('iProgSMS OTP API error', [
+                    'to' => $formattedPhone,
+                    'status' => $response->status(),
+                    'response' => $response->body(),
+                    'type' => 'otp_verification'
+                ]);
+
+                return false;
+            }
+        } catch (\Exception $e) {
+            $errorMessage = $e->getMessage();
+
+            Log::error('OTP sending failed', [
+                'to' => $formattedPhone,
+                'error' => $errorMessage,
+                'type' => 'otp_verification'
+            ]);
+
+            return false;
+        }
+    }
+
+    /**
+     * Verify OTP via iProgSMS OTP API
+     */
+    public function verifyOtp($phone, $otp)
+    {
+        if (!$phone || $phone === 'Not provided') {
+            Log::info('No phone number available for OTP verification');
+            return false;
+        }
+
+        // Check if iProgSMS is configured
+        if (!$this->apiToken) {
+            $error = 'iProgSMS service not configured - missing API token';
+            Log::warning($error);
+            return false;
+        }
+
+        // Format phone number
+        $formattedPhone = $this->formatPhoneNumber($phone);
+
+        try {
+            // Verify OTP via iProgSMS OTP API
+            $response = Http::withHeaders([
+                'Content-Type' => 'application/json'
+            ])->withOptions([
+                'verify' => false, // Disable SSL verification for development/testing
+            ])->post('https://www.iprogsms.com/api/v1/otp/verify_otp', [
+                'api_token' => $this->apiToken,
+                'phone_number' => $formattedPhone,
+                'otp' => $otp
+            ]);
+
+            if ($response->successful()) {
+                $responseData = $response->json();
+
+                if (isset($responseData['status']) && $responseData['status'] === 'success') {
+                    Log::info('OTP verified successfully via iProgSMS', [
+                        'to' => $formattedPhone,
+                        'response' => $responseData,
+                        'type' => 'otp_verification'
+                    ]);
+
+                    return true;
+                } else {
+                    $errorMessage = 'Invalid response from iProgSMS OTP verification API: ' . json_encode($responseData);
+                    Log::error('iProgSMS OTP verification API error', [
+                        'to' => $formattedPhone,
+                        'response' => $responseData,
+                        'type' => 'otp_verification'
+                    ]);
+                    return false;
+                }
+            } else {
+                $errorMessage = 'iProgSMS OTP verification API error: ' . $response->status() . ' - ' . $response->body();
+
+                Log::error('iProgSMS OTP verification API error', [
+                    'to' => $formattedPhone,
+                    'status' => $response->status(),
+                    'response' => $response->body(),
+                    'type' => 'otp_verification'
+                ]);
+
+                return false;
+            }
+        } catch (\Exception $e) {
+            $errorMessage = $e->getMessage();
+
+            Log::error('OTP verification failed', [
+                'to' => $formattedPhone,
+                'error' => $errorMessage,
+                'type' => 'otp_verification'
+            ]);
+
+            return false;
+        }
     }
 
     /**

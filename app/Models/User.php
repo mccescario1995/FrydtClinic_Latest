@@ -189,43 +189,47 @@ class User extends Authenticatable
             return false;
         }
 
-        $otp = $this->generateOtp();
-
         $smsService = app(\App\Services\SmsService::class);
-        return $smsService->sendOtp($phone, $otp, [
+        return $smsService->sendOtp($phone, [
             'user_id' => $this->id,
             'type' => 'otp_verification'
         ]);
     }
 
     /**
-     * Verify OTP code
+     * Verify OTP code via iProgSMS API
      */
     public function verifyOtp($otp)
     {
-        // Check if OTP is expired
-        if ($this->isOtpExpired()) {
+        // Get phone number from patient profile if user is patient
+        $phone = null;
+        if ($this->user_type === 'patient' && $this->patientProfile) {
+            $phone = $this->patientProfile->phone;
+        } elseif ($this->user_type === 'employee' && $this->employeeProfile) {
+            $phone = $this->employeeProfile->phone;
+        }
+
+        if (!$phone || $phone === 'Not provided') {
             return false;
         }
 
-        // Check if too many attempts
-        if ($this->otp_attempts >= 3) {
-            return false;
-        }
+        $smsService = app(\App\Services\SmsService::class);
+        $result = $smsService->verifyOtp($phone, $otp);
 
-        if ($this->otp_code === $otp) {
+        if ($result) {
+            // Clear OTP after successful verification
             $this->update([
                 'otp_verified_at' => now(),
-                'otp_code' => null, // Clear OTP after successful verification
+                'otp_code' => null,
                 'otp_expires_at' => null,
                 'otp_attempts' => 0,
             ]);
-            return true;
+        } else {
+            // Increment attempts on failure
+            $this->increment('otp_attempts');
         }
 
-        // Increment attempts on failure
-        $this->increment('otp_attempts');
-        return false;
+        return $result;
     }
 
     /**
