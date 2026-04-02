@@ -3704,18 +3704,10 @@ class AdminController extends Controller
             ->with('employeeProfile')
             ->orderBy('name')
             ->get(['id', 'name']);
-        $positions = User::where('user_type', 'employee')
-            ->join('employee_profiles', 'employee_profiles.employee_id', '=', 'users.id')
-            ->whereNotNull('employee_profiles.position')
-            ->distinct()
-            ->orderBy('employee_profiles.position')
-            ->pluck('employee_profiles.position')
-            ->toArray();
-        
+
         return view('admin-portal.create-mandatory-deduction', compact(
-            'deductionTypes', 
-            'employees',
-            'positions'
+            'deductionTypes',
+            'employees'
         ));
     }
 
@@ -3735,24 +3727,9 @@ class AdminController extends Controller
             'is_active' => 'boolean',
             'effective_date' => 'nullable|date',
             'notes' => 'nullable|string',
-            // Selection validation
-            'selection_mode' => 'required|in:individual,position',
-            'employee_ids' => 'required_if:selection_mode,individual|array',
+            'employee_ids' => 'required|array|min:1',
             'employee_ids.*' => 'exists:users,id',
-            'positions' => 'required_if:selection_mode,position|array',
-        ], [], [
-            'selection_mode' => 'Selection method',
-            'employee_ids' => 'Employees',
-            'positions' => 'Positions'
         ]);
-        
-        // Validate that at least one selection method has values
-        if ($request->selection_mode === 'individual' && empty($request->employee_ids)) {
-            $request->merge(['employee_ids' => []]); // Will trigger validation error
-        }
-        if ($request->selection_mode === 'position' && empty($request->positions)) {
-            $request->merge(['positions' => []]); // Will trigger validation error
-        }
         
         // Create the mandatory deduction
         $deduction = \App\Models\MandatoryDeduction::create([
@@ -3767,24 +3744,10 @@ class AdminController extends Controller
             'effective_date' => $request->effective_date,
             'notes' => $request->notes,
         ]);
-        
+
         // Get employees to apply deduction to
-        $employeeIds = [];
-        
-        if ($request->selection_mode === 'individual') {
-            $employeeIds = $request->employee_ids;
-        } elseif ($request->selection_mode === 'position') {
-            // Get all employees with selected positions
-            $employees = \App\Models\User::where('user_type', 'employee')
-                ->whereHas('employeeProfile', function ($query) use ($request) {
-                    $query->whereIn('position', $request->positions);
-                })
-                ->pluck('id')
-                ->toArray();
-            
-            $employeeIds = $employees;
-        }
-        
+        $employeeIds = $request->employee_ids;
+
         // Create employee deduction records
         foreach ($employeeIds as $employeeId) {
             \App\Models\EmployeeDeduction::firstOrCreate(
@@ -3793,9 +3756,7 @@ class AdminController extends Controller
                     'is_enabled' => true,
                     'custom_percentage_rate' => null,
                     'custom_fixed_amount' => null,
-                    'notes' => $request->selection_mode === 'position' 
-                        ? 'Applied via position selection: ' . implode(', ', $request->positions)
-                        : 'Applied via individual selection'
+                    'notes' => 'Applied via individual selection'
                 ]
             );
         }
