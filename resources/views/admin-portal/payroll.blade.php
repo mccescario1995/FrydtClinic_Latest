@@ -240,50 +240,14 @@
                             </div>
                         </div>
                     </div>
-                    <div class="row">
-                        <div class="col-md-6">
-                            <div class="mb-3">
-                                <label for="overtime_rate" class="form-label">Overtime Rate (₱)</label>
-                                <input type="number" class="form-control" id="overtime_rate" name="overtime_rate" step="0.01" min="0" required>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="row">
-                        <div class="col-md-12">
-                            <h6 class="mb-3">Deductions Breakdown</h6>
-                        </div>
-                        <div class="col-md-6">
-                            <div class="mb-3">
-                                <label for="sss_deduction" class="form-label">SSS (₱)</label>
-                                <input type="number" class="form-control" id="sss_deduction" name="sss_deduction" step="0.01" min="0" value="0">
-                            </div>
-                        </div>
-                        <div class="col-md-6">
-                            <div class="mb-3">
-                                <label for="philhealth_deduction" class="form-label">PhilHealth (₱)</label>
-                                <input type="number" class="form-control" id="philhealth_deduction" name="philhealth_deduction" step="0.01" min="0" value="0">
-                            </div>
-                        </div>
-                        <div class="col-md-6">
-                            <div class="mb-3">
-                                <label for="pagibig_deduction" class="form-label">Pag-IBIG (₱)</label>
-                                <input type="number" class="form-control" id="pagibig_deduction" name="pagibig_deduction" step="0.01" min="0" value="0">
-                            </div>
-                        </div>
-                        <div class="col-md-6">
-                            <div class="mb-3">
-                                <label for="tax_deduction" class="form-label">Withholding Tax (₱)</label>
-                                <input type="number" class="form-control" id="tax_deduction" name="tax_deduction" step="0.01" min="0" value="0">
-                            </div>
-                        </div>
-                        <div class="col-md-6">
-                            <div class="mb-3">
-                                <label for="other_deductions" class="form-label">Other Deductions (₱)</label>
-                                <input type="number" class="form-control" id="other_deductions" name="other_deductions" step="0.01" min="0" value="0">
-                                <div class="form-text">Insurance, loans, or other deductions</div>
-                            </div>
-                        </div>
-                    </div>
+                     <div class="row">
+                         <div class="col-md-6">
+                             <div class="mb-3">
+                                 <label for="overtime_rate" class="form-label">Overtime Rate (₱)</label>
+                                 <input type="number" class="form-control" id="overtime_rate" name="overtime_rate" step="0.01" min="0" required>
+                             </div>
+                         </div>
+                     </div>
                     <div class="mb-3">
                         <label class="form-label">Select Employees</label>
                         <div class="border rounded p-3" style="max-height: 200px; overflow-y: auto;">

@@ -48,7 +48,7 @@
 <div class="alert alert-danger alert-dismissible fade show" role="alert">
     <i class="fas fa-exclamation-triangle me-2"></i>
     <strong>Out of Stock Items:</strong> {{ $outOfStockItems->count() }} item(s) are currently out of stock.
-    <a href="{{ route('admin-portal.inventory') }}" class="alert-link">View Inventory</a>
+    <a href="{{ route('admin-portal.inventory') }}?item_type=&category=&stock_status=out_of_stock&search=" class="alert-link">View Inventory</a>
     <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
 </div>
 @endif
