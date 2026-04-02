@@ -550,10 +550,12 @@ class SmsService
         try {
             // Make API call to get credits
             $response = Http::withOptions([
-                'verify' => true, // Disable SSL verification for development/testing
-            ])->get($this->apiUrl . '/account/sms_credits', [
+                'verify' => false, // Disable SSL verification for development/testing
+            ])->get('https://www.iprogsms.com/api/v1/account/sms_credits', [
                 'api_token' => $this->apiToken
             ]);
+
+            \Log::info($response);
 
             if ($response->successful()) {
                 $responseData = $response->json();
