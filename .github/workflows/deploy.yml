@@ -1,0 +1,153 @@
+name: Deploy to Hostinger
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.2'
+          extensions: pdo, mbstring, bcmath, ctype, fileinfo, json, openssl, pdo_mysql, tokenizer, xml
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '18'
+
+      - name: Install Composer dependencies
+        run: composer install --no-dev --optimize-autoloader
+
+      - name: Install NPM dependencies
+        run: npm ci
+
+      - name: Build assets
+        run: npm run build
+
+      - name: Deploy files to Hostinger
+        uses: appleboy/scp-action@v0.1.4
+        with:
+          host: 145.79.14.49
+          username: u209535247
+          password: Frydt@2025
+          port: 65002
+          source: "."
+          target: "/home/u209535247/domains/frydtlyinginclinic.com/public_html"
+          strip_components: 0
+
+      - name: Run post-deployment commands
+        uses: appleboy/ssh-action@v1.0.3
+        with:
+          host: 145.79.14.49
+          username: u209535247
+          password: Frydt@2025
+          port: 65002
+          script: |
+            cd /home/u209535247/domains/frydtlyinginclinic.com/public_html
+            cat > .env << EOF
+            APP_NAME=FRYDTLyinginClinicApp
+            APP_ENV=production
+            APP_KEY=
+            APP_DEBUG=false
+            APP_URL=https://frydtlyinginclinic.com
+
+            LOG_CHANNEL=stack
+            LOG_DEPRECATIONS_CHANNEL=null
+            LOG_LEVEL=error
+
+            DB_CONNECTION=mysql
+            DB_HOST=153.92.15.71
+            DB_PORT=3306
+            DB_DATABASE=u209535247_frydtdb
+            DB_USERNAME=u209535247_frydtclinic
+            DB_PASSWORD=2qqk*+3wP
+
+            BROADCAST_DRIVER=log
+            CACHE_DRIVER=file
+            FILESYSTEM_DISK=local
+            QUEUE_CONNECTION=sync
+            SESSION_DRIVER=file
+            SESSION_LIFETIME=120
+
+            MEMCACHED_HOST=127.0.0.1
+
+            REDIS_HOST=127.0.0.1
+            REDIS_PASSWORD=null
+            REDIS_PORT=6379
+
+            MAIL_MAILER=smtp
+            MAIL_HOST=mailpit
+            MAIL_PORT=1025
+            MAIL_USERNAME=null
+            MAIL_PASSWORD=null
+            MAIL_ENCRYPTION=null
+            MAIL_FROM_ADDRESS="hello@example.com"
+            MAIL_FROM_NAME="${APP_NAME}"
+
+            AWS_ACCESS_KEY_ID=
+            AWS_SECRET_ACCESS_KEY=
+            AWS_DEFAULT_REGION=us-east-1
+            AWS_BUCKET=
+            AWS_USE_PATH_STYLE_ENDPOINT=false
+
+            PUSHER_APP_ID=
+            PUSHER_APP_KEY=
+            PUSHER_APP_SECRET=
+            PUSHER_HOST=
+            PUSHER_PORT=443
+            PUSHER_SCHEME=https
+            PUSHER_APP_CLUSTER=mt1
+
+            VITE_PUSHER_APP_KEY="${PUSHER_APP_KEY}"
+            VITE_PUSHER_HOST="${PUSHER_HOST}"
+            VITE_PUSHER_PORT="${PUSHER_PORT}"
+            VITE_PUSHER_SCHEME="${PUSHER_SCHEME}"
+            VITE_PUSHER_APP_CLUSTER="${PUSHER_APP_CLUSTER}"
+
+            PAYPAL_MODE=sandbox
+            PAYPAL_SANDBOX_CLIENT_ID="Ae_bCf7lCwtbtrGHLLt0T2F1Th7kk9QI9jOJJbSGD6Ki3Qf2otZeMgFakobktNJAUqpStxkgmawj9aqq"
+            PAYPAL_SANDBOX_CLIENT_SECRET="EPDcnzz4VZWnLQxjUHG0PCme5RpIV_-lcjCzqpEGTPasY3oNvhyIApF1_KYb01SqokfQEcJOG_tlWMdE"
+            PAYPAL_CURRENCY=PHP
+            PAYPAL_VALIDATE_SSL=false
+
+            PHILSMS_TOKEN="295|STsCmPOUi24UTRwdGZcyQgaYS5OMUSY6hVp7eaMve74870c3"
+            PHILSMS_SENDER_ID="PhilSMS"
+            PHILSMS_URL="https://app.philsms.com/api/v3/sms/send"
+
+            IPROGSMS_TOKEN=e887c8c0579c376b96c1031dd1ee23fb7dd5055a
+            IPROGSMS_URL=https://www.iprogsms.com/api/v1/sms_messages
+
+            BACKPACK_REGISTRATION_OPEN=true
+
+            EOF
+            
+            cp -r public/* ./
+
+            sed -i "s|'/../|'/./|g" index.php
+
+            composer install --no-dev --optimize-autoloader
+
+            php artisan basset:install
+            php artisan key:generate
+            # php artisan migrate:fresh --seed --seeder=DatabaseSeeder --force
+            php artisan migrate
+            php artisan view:clear
+            php artisan cache:clear
+            php artisan config:clear
+            php artisan route:clear
+            php artisan optimize:clear
+
+            php artisan view:cache
+            php artisan config:cache
+
+            # chmod -R 755 storage
+            # chmod -R 755 bootstrap/cache

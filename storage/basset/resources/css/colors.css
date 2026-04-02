@@ -1,0 +1,122 @@
+/**
+    This file declares css color variables for branding purposes.
+    Adjusted to match green theme palette.
+*/
+
+@charset "UTF-8";
+:root, [data-bs-theme=light], [data-menu-theme=light] {
+    --tblr-gray: #4c496c;
+    --tblr-gray-dark: #211d3b;
+    --tblr-gray-100: #f1f5f9;
+    --tblr-gray-200: #e2e8f0;
+    --tblr-gray-300: #c8d3e1;
+    --tblr-gray-400: #c9c1d6;
+    --tblr-gray-500: #736c91;
+    --tblr-gray-600: #4c496c;
+    --tblr-gray-700: #333152;
+    --tblr-gray-800: #211d3b;
+    --tblr-gray-900: #1a0f2a;
+
+    /* ✅ Updated brand colors */
+    --tblr-primary: #66cc66; /* main green */
+    --tblr-secondary: #4e594e;
+    --tblr-success: #42ba96;
+    --tblr-info: #467fd0;
+    --tblr-warning: #ffc107;
+    --tblr-danger: #df4759;
+    --tblr-light: #f8fafc;
+    --tblr-dark: #241f2d;
+    --tblr-muted: #66626c;
+    --tblr-tabler: #66cc66;
+
+    /* RGB values */
+    --tblr-primary-rgb: 102, 204, 102;
+    --tblr-secondary-rgb: 153, 230, 153;
+    --tblr-tabler-rgb: 102, 204, 102;
+
+    /* Emphasis text */
+    --tblr-primary-text-emphasis: #333333;
+    --tblr-secondary-text-emphasis: #333333;
+    --tblr-light-text-emphasis: #333333;
+    --tblr-dark-text-emphasis: #333333;
+
+    /* Background subtles */
+    --tblr-primary-bg-subtle: #b2ffb2;
+    --tblr-secondary-bg-subtle: #99e699;
+    --tblr-dark-bg-subtle: #99e699;
+
+    /* Borders */
+    --tblr-primary-border-subtle: #99e699;
+    --tblr-secondary-border-subtle: #99e699;
+    --tblr-dark-border-subtle: #66cc66;
+
+    /* Body / layout */
+    --tblr-body-font-size: 0.875rem;
+    --tblr-body-font-weight: 400;
+    --tblr-body-line-height: 1.4285714286;
+    --tblr-body-color: #333333;
+    --tblr-body-color-rgb: 51, 51, 51;
+    --tblr-body-bg: #c0fcc056;
+    --tblr-body-bg-rgb: 178, 255, 178;
+
+    /* Links */
+    --tblr-link-color: #458f45;
+    --tblr-link-color-rgb: 69, 143, 69;
+    --tblr-link-hover-color: #99e699;
+    --tblr-link-hover-color-rgb: 153, 230, 153;
+
+    /* Borders & rings */
+    --tblr-border-color: #99e699;
+    --tblr-border-color-translucent: rgba(102, 204, 102, .25);
+    --tblr-focus-ring-color: rgba(102, 204, 102, .25);
+
+    /* Navbar / Topbar */
+    --tblr-navbar-border-color: transparent;
+    --tblr-navbar-bg: #ffffff;
+    --tblr-navbar-color: #333333;
+
+    /* Sidebar (align with theme) */
+    --sidebar-bg: #b2ffb2;
+    --sidebar-text: #333333;
+    --sidebar-hover: #99e699;
+
+    /* Topbar (align with theme) */
+    --topbar-bg: #ffffff;
+    --topbar-text: #333333;
+
+    --bg-switch-checked-color: var(--tblr-primary);
+}
+
+[data-bs-theme=dark], [data-menu-theme=dark] {
+    --tblr-body-color: #b2ffb2;
+    --tblr-body-color-rgb: 178, 255, 178;
+    --tblr-body-bg: #181818;
+    --tblr-body-bg-rgb: 24, 24, 24;
+
+    --tblr-emphasis-color: #fff;
+    --tblr-emphasis-color-rgb: 255, 255, 255;
+
+    /* Dark mode primary colors */
+    --tblr-primary: #66cc66;
+    --tblr-primary-rgb: 102, 204, 102;
+    --tblr-link-color: #99e699;
+    --tblr-link-hover-color: #b2ffb2;
+    --tblr-link-color-rgb: 153, 230, 153;
+    --tblr-link-hover-color-rgb: 178, 255, 178;
+
+    /* Borders & surfaces */
+    --tblr-border-color: #333333;
+    --tblr-border-color-translucent: rgba(102, 204, 102, .25);
+    --tblr-bg-surface: #1a1a1a;
+    --tblr-navbar-bg: #1a1a1a;
+    --tblr-navbar-color: #b2ffb2;
+    --tblr-navbar-border-color: transparent;
+
+    /* Sidebar / topbar in dark mode */
+    --sidebar-bg: #1a1a1a;
+    --sidebar-text: #b2ffb2;
+    --sidebar-hover: #66cc66;
+
+    --topbar-bg: #181818;
+    --topbar-text: #b2ffb2;
+}

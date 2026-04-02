@@ -1,0 +1,151 @@
+/* ===============================
+   THEME VARIABLES
+   =============================== */
+:root,[data-bs-theme=light], [data-menu-theme=light] {
+    --theme-bg: #c0fcc056;
+    --theme-text: #333333;
+    --theme-border: #99e699;
+    --theme-hover: #99e699;
+    --theme-focus: #66cc66;
+
+    --sidebar-bg: #b2ffb2;
+    --sidebar-text: #333333;
+    --sidebar-hover: #99e699;
+
+    --topbar-bg: #ffffff;
+    --topbar-text: #333333;
+
+}
+
+/* ===============================
+   GLOBAL
+   =============================== */
+body {
+    color: var(--theme-text);
+    background-color: #f8fdf8;
+}
+
+/* ===============================
+   BUTTONS
+   (Backpack .btn + native <button>)
+   =============================== */
+button,
+.btn {
+    background-color: var(--theme-bg);
+    color: var(--theme-text);
+    border: 1px solid var(--theme-border);
+    border-radius: 6px;
+    transition: all 0.2s ease-in-out;
+}
+
+button:hover,
+.btn:hover {
+    background-color: var(--theme-hover);
+    border-color: var(--theme-focus);
+    color: var(--theme-text);
+}
+
+/* ===============================
+   INPUTS / TEXTAREAS / SELECTS
+   (Backpack forms)
+   =============================== */
+input,
+textarea,
+select,
+.form-control {
+    border: 1px solid var(--theme-border);
+    background-color: #fff;
+    color: var(--theme-text);
+    border-radius: 6px;
+    transition: all 0.2s ease-in-out;
+}
+
+input:focus,
+textarea:focus,
+select:focus,
+.form-control:focus {
+    outline: none;
+    border-color: var(--theme-focus);
+    box-shadow: 0 0 0 3px rgba(102, 204, 102, 0.3);
+}
+
+/* ===============================
+   LINKS
+   =============================== */
+a {
+    color: var(--theme-text);
+    text-decoration: none;
+    transition: all 0.2s ease-in-out;
+}
+
+a:hover {
+    color: var(--theme-focus);
+}
+
+/* ===============================
+   TABLES
+   =============================== */
+table th {
+    background-color: var(--theme-bg) !important;
+    color: var(--theme-text) !important;
+}
+
+table td {
+    border: 1px solid var(--theme-border);
+    padding: 0.5rem;
+}
+
+/* ===============================
+   BACKPACK SIDEBAR
+   =============================== */
+.sidebar {
+    background-color: var(--sidebar-bg) !important;
+    color: var(--sidebar-text) !important;
+}
+
+.sidebar .nav-link {
+    color: var(--sidebar-text) !important;
+    transition: all 0.2s ease-in-out;
+}
+
+.sidebar .nav-link:hover,
+.sidebar .nav-link.active {
+    background-color: var(--sidebar-hover) !important;
+    color: var(--sidebar-text) !important;
+}
+
+/* ===============================
+   BACKPACK TOPBAR
+   =============================== */
+.navbar {
+    background-color: var(--topbar-bg) !important;
+    color: var(--topbar-text) !important;
+    border-bottom: 1px solid var(--theme-border);
+}
+
+.navbar a {
+    color: var(--topbar-text) !important;
+}
+
+.navbar a:hover {
+    color: var(--theme-focus) !important;
+}
+
+/* ===============================
+   BACKPACK CARDS & PANELS
+   =============================== */
+.card {
+    border: 1px solid var(--theme-border);
+    border-radius: 8px;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05);
+}
+
+.card-header {
+    background-color: var(--theme-bg) !important;
+    color: var(--theme-text) !important;
+    font-weight: 600;
+}
+
+.card-body {
+    background-color: #ffffff;
+}
