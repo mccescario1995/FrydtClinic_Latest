@@ -291,7 +291,7 @@ function showSmsModal(smsLog) {
                 <p><strong>Status:</strong> ${statusBadge}</p>
                 <p><strong>Created:</strong> ${new Date(smsLog.created_at).toLocaleString()}</p>
                 ${smsLog.sent_at ? `<p><strong>Sent At:</strong> ${new Date(smsLog.sent_at).toLocaleString()}</p>` : ''}
-                ${smsLog.twilio_sid ? `<p><strong>Twilio SID:</strong> <code>${smsLog.twilio_sid}</code></p>` : ''}
+                ${smsLog.twilio_sid ? `<p><strong>SMS SID:</strong> <code>${smsLog.twilio_sid}</code></p>` : ''}
             </div>
             <div class="col-md-6">
                 <h6>Recipient Information</h6>

@@ -2341,15 +2341,11 @@ class AdminController extends Controller
     public function updateSmsSettings(Request $request)
     {
         $request->validate([
-            'iprogsms_token' => 'nullable|string|max:255',
-            'iprogsms_url' => 'nullable|url',
             'admin_sms_number' => 'nullable|string|max:20',
             'sms_enabled' => 'nullable|boolean',
         ]);
 
         // Update settings in database
-        \App\Models\Setting::set('iprogsms_token', $request->iprogsms_token ?: '', 'string', 'sms', 'iProgSMS API Token');
-        \App\Models\Setting::set('iprogsms_url', $request->iprogsms_url ?: 'https://www.iprogsms.com/api/v1/sms_messages', 'string', 'sms', 'iProgSMS API URL');
         \App\Models\Setting::set('admin_sms_number', $request->admin_sms_number ?: '', 'string', 'sms', 'Admin SMS notification number');
         \App\Models\Setting::set('sms_enabled', $request->sms_enabled ? '1' : '0', 'boolean', 'sms', 'Enable SMS notifications');
 
@@ -2379,7 +2375,7 @@ class AdminController extends Controller
             return response()->json([
                 'success' => true,
                 'message' => 'Credits retrieved successfully.',
-                'credits' => $credits['load_balance']
+                'credits' => $credits['credit_balance']
             ]);
         } else {
             return response()->json([
@@ -2401,6 +2397,8 @@ class AdminController extends Controller
 
         $smsService = app(\App\Services\SmsService::class);
 
+        
+
         if (!$smsService->isConfigured()) {
             return response()->json([
                 'success' => false,
@@ -2408,7 +2406,7 @@ class AdminController extends Controller
             ]);
         }
 
-        $result = $smsService->sendNotification($request->phone, 'This is a test SMS from FRYDT Clinic Management System.', [
+        $result = $smsService->sendNotification($request->phone, 'This is a Sample SMS from FRYDT Clinic Management System.', [
             'type' => 'test',
             'sent_by' => backpack_user()->id,
             'metadata' => [
@@ -2426,7 +2424,7 @@ class AdminController extends Controller
         } else {
             return response()->json([
                 'success' => false,
-                'message' => 'Failed to send test SMS. Please check your Twilio configuration.'
+                'message' => 'Failed to send test SMS. Please check your SMS API configuration.'
             ]);
         }
     }

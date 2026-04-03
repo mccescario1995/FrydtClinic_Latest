@@ -13,21 +13,7 @@ class SettingsSeeder extends Seeder
     public function run(): void
     {
         $settings = [
-            // SMS Settings - Read from .env if available
-            [
-                'key' => 'iprogsms_token',
-                'value' => trim(env('IPROGSMS_TOKEN', ''), '"'),
-                'type' => 'string',
-                'group' => 'sms',
-                'description' => 'iProgSMS API Token',
-            ],
-            [
-                'key' => 'iprogsms_url',
-                'value' => env('IPROGSMS_URL', 'https://www.iprogsms.com/api/v1/sms_messages'),
-                'type' => 'string',
-                'group' => 'sms',
-                'description' => 'iProgSMS API URL',
-            ],
+            // SMS Settings
             [
                 'key' => 'admin_sms_number',
                 'value' => env('ADMIN_SMS_NUMBER', ''),
@@ -37,7 +23,7 @@ class SettingsSeeder extends Seeder
             ],
             [
                 'key' => 'sms_enabled',
-                'value' => env('IPROGSMS_TOKEN') ? '1' : '0',
+                'value' => env('SEMAPHORE_API_KEY') ? '1' : '0',
                 'type' => 'boolean',
                 'group' => 'sms',
                 'description' => 'Enable SMS notifications',

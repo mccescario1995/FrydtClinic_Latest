@@ -134,11 +134,11 @@
                                 <div>
                                     <strong>SMS Credits:</strong>
                                     <span id="sms-credits-display">
-                                        @if(\App\Models\Setting::get('iprogsms_token'))
+                                        @if(env('SEMAPHORE_API_KEY'))
                                             <span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
                                             Loading credits...
                                         @else
-                                            <span class="text-muted">Configure API token to check credits</span>
+                                            <span class="text-muted">Configure SEMAPHORE_API_KEY in .env to check credits</span>
                                         @endif
                                     </span>
                                 </div>
@@ -152,22 +152,6 @@
 
                 <form method="POST" action="{{ route('admin-portal.update-sms-settings') }}">
                     @csrf
-                    <div class="row mb-3">
-                        <div class="col-md-6">
-                            <label for="iprogsms_token" class="form-label">iProgSMS API Token</label>
-                            <input type="password" class="form-control" id="iprogsms_token" name="iprogsms_token"
-                                   value="{{ \App\Models\Setting::get('iprogsms_token') }}" placeholder="Enter your iProgSMS API token">
-                            <div class="form-text">Your iProgSMS API token</div>
-                        </div>
-                        <div class="col-md-6">
-                            <label for="iprogsms_url" class="form-label">API URL</label>
-                            <input type="url" class="form-control" id="iprogsms_url" name="iprogsms_url"
-                                   value="{{ \App\Models\Setting::get('iprogsms_url', 'https://www.iprogsms.com/api/v1/sms_messages') }}" placeholder="https://www.iprogsms.com/api/v1/sms_messages">
-                            <div class="form-text">iProgSMS API endpoint URL</div>
-                        </div>
-                    </div>
-
-
                     <div class="row mb-3">
                         <div class="col-md-6">
                             <label for="admin_sms_number" class="form-label">Admin SMS Number</label>
@@ -447,12 +431,9 @@ function testSms() {
     });
 }
 
-// Auto-check credits on page load if token is configured
+// Auto-check credits on page load
 document.addEventListener('DOMContentLoaded', function() {
-    const tokenInput = document.getElementById('iprogsms_token');
-    if (tokenInput && tokenInput.value.trim()) {
-        checkSmsCredits();
-    }
+    checkSmsCredits();
 });
 </script>
 @endsection

@@ -41,9 +41,9 @@ return [
         'webhook_id' => env('PAYPAL_WEBHOOK_ID'), // Optional: for webhook verification
     ],
 
-    'iprogsms' => [
-        'token' => env('IPROGSMS_TOKEN'),
-        'url' => env('IPROGSMS_URL', 'https://www.iprogsms.com/api/v1/sms_messages'),
+    'semaphore' => [
+        'apikey' => env('SEMAPHORE_API_KEY'),
+        'url' => 'https://api.semaphore.co/api/v4',
         'admin_sms_number' => env('ADMIN_SMS_NUMBER'),
     ],
 
