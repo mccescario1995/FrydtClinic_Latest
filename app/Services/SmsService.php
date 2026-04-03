@@ -67,8 +67,8 @@ class SmsService
             $response = Http::withHeaders([
                 'Content-Type' => 'application/json'
             ])->withOptions([
-                'verify' => false, // Disable SSL verification for development/testing
-            ])->post($this->apiUrl, $sendData);
+                        'verify' => false, // Disable SSL verification for development/testing
+                    ])->post($this->apiUrl, $sendData);
 
             if ($response->successful()) {
                 $responseData = $response->json();
@@ -141,10 +141,10 @@ class SmsService
         }
 
         $message = "Appointment booked successfully!\n" .
-                   "Date: " . $appointment->appointment_datetime->format('M d, Y h:i A') . "\n" .
-                   "Service: " . $appointment->service->name . "\n" .
-                   "Provider: " . $appointment->employee->name . "\n" .
-                   "Status: Scheduled - Please arrive 15 minutes early.";
+            "Date: " . $appointment->appointment_datetime->format('M d, Y h:i A') . "\n" .
+            "Service: " . $appointment->service->name . "\n" .
+            "Provider: " . $appointment->employee->name . "\n" .
+            "Status: Scheduled - Please arrive 15 minutes early.";
 
         return $this->sendSms($phone, $message, [
             'type' => 'appointment_booking',
@@ -199,9 +199,9 @@ class SmsService
         }
 
         $message = "Your appointment has been confirmed!\n" .
-                   "Date: " . $appointment->appointment_datetime->format('M d, Y h:i A') . "\n" .
-                   "Service: " . $appointment->service->name . "\n" .
-                   "Provider: " . $appointment->employee->name;
+            "Date: " . $appointment->appointment_datetime->format('M d, Y h:i A') . "\n" .
+            "Service: " . $appointment->service->name . "\n" .
+            "Provider: " . $appointment->employee->name;
 
         return $this->sendSms($phone, $message, [
             'type' => 'appointment',
@@ -229,9 +229,9 @@ class SmsService
         }
 
         $message = "Reminder: You have an appointment tomorrow!\n" .
-                   "Date: " . $appointment->appointment_datetime->format('M d, Y h:i A') . "\n" .
-                   "Service: " . $appointment->service->name . "\n" .
-                   "Provider: " . $appointment->employee->name;
+            "Date: " . $appointment->appointment_datetime->format('M d, Y h:i A') . "\n" .
+            "Service: " . $appointment->service->name . "\n" .
+            "Provider: " . $appointment->employee->name;
 
         return $this->sendSms($phone, $message, [
             'type' => 'reminder',
@@ -259,9 +259,9 @@ class SmsService
         }
 
         $message = "Payment received successfully!\n" .
-                   "Amount: ₱" . number_format($payment->amount, 2) . "\n" .
-                   "Reference: " . ($payment->payment_reference ?? 'N/A') . "\n" .
-                   "Thank you for choosing FRYDT Clinic!";
+            "Amount: ₱" . number_format($payment->amount, 2) . "\n" .
+            "Reference: " . ($payment->payment_reference ?? 'N/A') . "\n" .
+            "Thank you for choosing FRYDT Clinic!";
 
         return $this->sendSms($phone, $message, [
             'type' => 'payment',
@@ -291,9 +291,9 @@ class SmsService
         }
 
         $message = "Your lab results are ready!\n" .
-                   "Test: " . $labResult->test_name . "\n" .
-                   "Status: " . $labResult->result_status . "\n" .
-                   "Please login to view detailed results.";
+            "Test: " . $labResult->test_name . "\n" .
+            "Status: " . $labResult->result_status . "\n" .
+            "Please login to view detailed results.";
 
         return $this->sendSms($phone, $message, [
             'type' => 'lab_result',
@@ -347,8 +347,8 @@ class SmsService
             $response = Http::withHeaders([
                 'Content-Type' => 'application/json'
             ])->withOptions([
-                'verify' => false, // Disable SSL verification for development/testing
-            ])->post('https://www.iprogsms.com/api/v1/otp/send_otp', $sendData);
+                        'verify' => false, // Disable SSL verification for development/testing
+                    ])->post('https://www.iprogsms.com/api/v1/otp/send_otp', $sendData);
 
             if ($response->successful()) {
                 $responseData = $response->json();
@@ -434,12 +434,12 @@ class SmsService
             $response = Http::withHeaders([
                 'Content-Type' => 'application/json'
             ])->withOptions([
-                'verify' => false, // Disable SSL verification for development/testing
-            ])->post('https://www.iprogsms.com/api/v1/otp/verify_otp', [
-                'api_token' => $this->apiToken,
-                'phone_number' => $formattedPhone,
-                'otp' => $otp
-            ]);
+                        'verify' => false, // Disable SSL verification for development/testing
+                    ])->post('https://www.iprogsms.com/api/v1/otp/verify_otp', [
+                        'api_token' => $this->apiToken,
+                        'phone_number' => $formattedPhone,
+                        'otp' => $otp
+                    ]);
 
             if ($response->successful()) {
                 $responseData = $response->json();
@@ -552,8 +552,8 @@ class SmsService
             $response = Http::withOptions([
                 'verify' => false, // Disable SSL verification for development/testing
             ])->get('https://www.iprogsms.com/api/v1/account/sms_credits', [
-                'api_token' => $this->apiToken
-            ]);
+                        'api_token' => $this->apiToken
+                    ]);
 
             \Log::info($response);
 
