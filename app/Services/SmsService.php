@@ -78,7 +78,7 @@ class SmsService
                 'apikey' => $this->apiKey,
                 'number' => $formattedTo,
                 'message' => $message,
-                // 'sendername' => '', //SEMAPHORE
+                'sendername' => 'FRYDT'
             ];
 
             // Send SMS via Semaphore API
@@ -86,7 +86,7 @@ class SmsService
                 ->withOptions(['verify' => false])
                 ->post($this->baseUrl.'/messages', $sendData);
 
-            dd('Response:', $response->json());
+            // dd('Response: ', $response->json(), 'Phone:' , $formattedTo);
 
             if ($response->successful()) {
                 $responseData = $response->json();
