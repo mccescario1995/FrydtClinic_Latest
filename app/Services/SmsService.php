@@ -503,8 +503,11 @@ class SmsService
             return false;
         }
 
+        // Trim whitespace from OTP input (handles copy-paste issues)
+        $trimmedOtp = trim($otp);
+        
         // Verify OTP code
-        if ($user->otp_code && $user->otp_code == $otp) {
+        if ($user->otp_code && $user->otp_code === $trimmedOtp) {
             // Success - clear OTP data
             $user->update([
                 'otp_code' => null,
@@ -527,6 +530,13 @@ class SmsService
                 'user_id' => $user->id,
                 'attempts' => $user->otp_attempts,
                 'type' => 'otp_verification',
+                'provided_otp' => $otp,
+                'trimmed_otp' => $trimmedOtp,
+                'stored_otp' => $user->otp_code,
+                'otp_match' => ($user->otp_code === $trimmedOtp),
+                'provided_otp_length' => strlen((string)$otp),
+                'trimmed_otp_length' => strlen((string)$trimmedOtp),
+                'stored_otp_length' => strlen((string)$user->otp_code),
             ]);
 
             return false;

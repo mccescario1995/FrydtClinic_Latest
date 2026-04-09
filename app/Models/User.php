@@ -6,6 +6,7 @@ use Backpack\CRUD\app\Models\Traits\CrudTrait;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
+use Illuminate\Support\Facades\Log;
 use Spatie\Permission\Traits\HasRoles;
 use App\Models\Appointment;
 use App\Models\EmployeeSchedule;
@@ -210,23 +211,28 @@ class User extends Authenticatable
         }
 
         if (!$phone || $phone === 'Not provided') {
+            Log::warning('OTP verification failed - no phone number', [
+                'user_id' => $this->id,
+                'user_type' => $this->user_type,
+            ]);
             return false;
         }
 
         $smsService = app(\App\Services\SmsService::class);
-        $result = $smsService->verifyOtp($phone, $otp);
+        $result = $smsService->verifyOtp($phone, $otp, $this->id);
 
-        if ($result) {
-            // Clear OTP after successful verification
-            $this->update([
-                'otp_verified_at' => now(),
-                'otp_code' => null,
-                'otp_expires_at' => null,
-                'otp_attempts' => 0,
+        // Add debugging info
+        if (!$result) {
+            Log::warning('OTP verification via service failed', [
+                'user_id' => $this->id,
+                'provided_otp' => $otp,
+                'stored_otp' => $this->otp_code,
+                'otp_match' => ($this->otp_code === $otp),
+                'provided_otp_length' => strlen((string)$otp),
+                'stored_otp_length' => strlen((string)$this->otp_code),
+                'otp_expires_at' => $this->otp_expires_at,
+                'otp_attempts' => $this->otp_attempts,
             ]);
-        } else {
-            // Increment attempts on failure
-            $this->increment('otp_attempts');
         }
 
         return $result;

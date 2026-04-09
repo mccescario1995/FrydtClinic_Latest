@@ -135,6 +135,9 @@ document.addEventListener('DOMContentLoaded', function() {
         if (this.value.length > 6) {
             this.value = this.value.slice(0, 6);
         }
+        
+        // Trim whitespace
+        this.value = this.value.trim();
     });
 
     // Auto-submit when 6 digits are entered
