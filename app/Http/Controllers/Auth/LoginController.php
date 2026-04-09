@@ -77,25 +77,33 @@ class LoginController extends BackpackLoginController
      */
     public function logout(Request $request)
     {
-
-        // DO THIS IN VENDER backpack/crud/src/app/library/auth/authenticatesusers.php
-
+        // Get user before logging out for cleanup
         $user = backpack_auth()->user();
 
-        $this->guard()->logout();
-
+        // Clear OTP fields for security
+        if ($user) {
+            User::where('id', $user->id)->update([
+                'otp_code' => null,
+                'otp_expires_at' => null,
+                'otp_verified_at' => null,
+                'otp_attempts' => 0,
+                'otp_last_sent_at' => null
+            ]);
+        }
+        // Invalidate session first to clear all session data
         $request->session()->invalidate();
 
-        $request->session()->regenerateToken();
+        // Then logout using the backpack guard
+        backpack_auth()->logout();
 
-        User::where('id', $user->id)->update([
-            'otp_code' => null,
-            'otp_expires_at' => null,
-            'otp_verified_at' => null,
-            'otp_attempts' => 0,
-            'otp_last_sent_at' => null
-        ]);
+        // Regenerate token to prevent session fixation
+        $request->session()->regenerateToken();        
 
+        if ($response = $this->loggedOut($request)) {
+            return $response;
+        }
+
+        // Redirect to homepage
         return redirect()->route('homepage');
     }
 }
