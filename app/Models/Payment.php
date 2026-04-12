@@ -274,7 +274,9 @@ class Payment extends Model
         }
 
         // Prepare services rendered data
-        $servicesRendered = [];
+        $servicesRendered = []; 
+
+
         if ($this->appointment) {
             $servicesRendered[] = [
                 'name' => $this->appointment->service->name ?? 'Medical Service',
@@ -288,6 +290,7 @@ class Payment extends Model
                 'date' => $this->prescription->dispensed_date ? $this->prescription->dispensed_date->format('Y-m-d') : now()->format('Y-m-d'),
                 'provider' => $this->prescription->dispenser->name ?? 'N/A',
                 'amount' => $this->amount,
+                'quantity' => $this->prescription->quantity_dispensed,
             ];
         } elseif ($this->items->count() > 0) {
             foreach ($this->items as $item) {
