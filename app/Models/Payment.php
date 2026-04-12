@@ -288,7 +288,7 @@ class Payment extends Model
             $servicesRendered[] = [
                 'name' => $this->prescription->inventory->name ?? 'Prescription Medicine',
                 'date' => $this->prescription->dispensed_date ? $this->prescription->dispensed_date->format('Y-m-d') : now()->format('Y-m-d'),
-                'provider' => $this->prescription->dispenser->name ?? 'N/A',
+                'provider' => $this->prescription->dispenser ? $this->prescription->dispenser->name : 'Clinic',
                 'amount' => $this->amount,
                 'quantity' => $this->prescription->quantity_dispensed,
             ];

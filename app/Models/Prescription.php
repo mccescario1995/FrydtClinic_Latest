@@ -202,7 +202,9 @@ class Prescription extends Model
 
         // Update prescription
         $this->quantity_dispensed = $newDispensedQuantity;
-        $this->dispensed_by = $dispensedBy ?: auth()->id();
+        if ($dispensedBy !== null) {
+            $this->dispensed_by = $dispensedBy;
+        }
         $this->dispensed_date = now();
 
         if ($newDispensedQuantity == $this->quantity_prescribed) {
